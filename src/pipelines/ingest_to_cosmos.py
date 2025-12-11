@@ -13,7 +13,7 @@ COSMOS_ENDPOINT = os.environ.get("COSMOS_ENDPOINT")
 COSMOS_KEY = os.environ.get("COSMOS_KEY")
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 CONTAINER_NAME = os.environ.get("CONTAINER_NAME")
-CSV_FILE = r"data/updated_product_catalog(in).csv"  #Placeholder here to avoid rerunning the code
+CSV_FILE = r"src/data/updated_product_catalog(in).csv"  #Placeholder here to avoid rerunning the code
 
 
 # 1. Read data from CSV
