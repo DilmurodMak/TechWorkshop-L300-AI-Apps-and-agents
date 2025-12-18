@@ -17,19 +17,24 @@ from app.servers.mcp_inventory_client import MCPShopperToolsClient
 
 from opentelemetry import trace
 from azure.monitor.opentelemetry import configure_azure_monitor
-from azure.ai.agents.telemetry import trace_function
+from azure.ai.agents.telemetry import trace_function, AIAgentsInstrumentor
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import time
-# from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
+from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
-# # Enable Azure Monitor tracing
+# Enable Azure Monitor tracing
 application_insights_connection_string = os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"]
-# configure_azure_monitor(connection_string=application_insights_connection_string)
-# OpenAIInstrumentor().instrument()
+# Suppress Azure Monitor performance counter warning to prevent recursion
+import logging
+logging.getLogger("azure.monitor.opentelemetry.exporter._performance_counters._manager").setLevel(logging.ERROR)
 
-# scenario = os.path.basename(__file__)
-# tracer = trace.get_tracer(__name__)
+configure_azure_monitor(connection_string=application_insights_connection_string)
+OpenAIInstrumentor().instrument()
+AIAgentsInstrumentor().instrument()
+
+scenario = os.path.basename(__file__)
+tracer = trace.get_tracer(__name__)
 
 # Increase thread pool size for better concurrency
 _executor = ThreadPoolExecutor(max_workers=8)
