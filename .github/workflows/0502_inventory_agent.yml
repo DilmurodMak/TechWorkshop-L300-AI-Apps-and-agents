@@ -1,0 +1,55 @@
+name: Deploy Inventory Agent
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/app/agents/inventoryAgent_initializer.py'
+      - 'src/prompts/InventoryAgentPrompt.txt'
+      - 'src/app/agents/agent_processor.py'
+  workflow_dispatch:
+
+jobs:
+  deploy-agent:
+    runs-on: ubuntu-latest
+    environment: DEV
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/requirements.txt
+
+      - name: Create .env file from secret
+        run: 'echo "$ENV" > src/.env'
+        shell: bash
+        env:
+          ENV: ${{ secrets.ENV }}
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Agent Initializer
+        run: |
+          cd src/app/agents
+          python inventoryAgent_initializer.py
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}

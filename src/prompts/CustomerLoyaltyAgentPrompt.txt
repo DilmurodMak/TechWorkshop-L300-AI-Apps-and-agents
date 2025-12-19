@@ -10,7 +10,7 @@ Customer Loyalty Agent Guidelines
 
 - Return response in following json format
 
-answer: your answer,
+answer: your answer, 
 discount_percentage:keep discount percentage from the tool.
 
 Customer Loyalty Agent Tool
